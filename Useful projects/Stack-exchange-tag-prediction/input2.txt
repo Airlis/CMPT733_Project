@@ -1,0 +1,60 @@
+unable to set array values in two php foreach loops
+I have defined two arrays as
+
+$array1 = (8,10);
+Array2 was array of stdobjects which was later converted into below using json decode, encode. Php echo output of the same is below:
+
+$array2 = Array
+(
+    [0] => Array
+        (
+            [id] => 6
+        )
+
+    [1] => Array
+        (
+            [id] => 8
+        )
+
+    [2] => Array
+        (
+            [id] => 10
+        )
+
+)
+Later I created one array
+
+foreach( $array2 as $value ) 
+            {
+                $valuesArray[] = array('',$value['id'],Input::get('date'),'0');   
+            }
+What I am trying to do is compare array1 with valuesarray. If $value['id'] i.e. second element matches with any of the element in array1, I will save 4th element of $nnn as 1. If it doesnt match with any of the element, I will save it as 0. My code below:
+
+foreach ($valuesArray as $value2) 
+        {
+                    foreach ($array1 as $value1)
+                    { 
+                        if ($value2[1] == $value1) 
+                            {$x = 1;} 
+                        else 
+                            {$x = 0;}
+                    }
+                $nnn[] = "('','".$value2[1]."','".Input::get('date')."','".$x."')";
+                }   
+
+            echo '<pre>',print_r($nnn,1),'</pre>';
+The output that I am getting is: Array
+
+(
+    [0] => ('','6','2016-04-25','0')
+    [1] => ('','8','2016-04-25','0')
+    [2] => ('','10','2016-04-25','1')
+)
+Correct output should be:
+
+Array
+(
+    [0] => ('','6','2016-04-25','1')
+    [1] => ('','8','2016-04-25','1')
+    [2] => ('','10','2016-04-25','0')
+)

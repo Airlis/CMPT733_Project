@@ -1,0 +1,15 @@
+JQuery AJAX: prevent the delay caused due to set interval function
+I am keeping a live track on no. of users in my system, for that I am using javascript's setInterval() function, following is the code:
+
+function fetchdis() {
+$.ajax({
+    url: "/count/dist",
+    dataType: "json"
+}).success(function(data){
+    $('#val_dis').html(JSON.stringify(data.sum));
+});
+}
+setInterval(function () {fetchdis()}, 3000);
+everything is working properly except I am getting a delay of 3 seconds also first time when I am loading the data(resulting into an empty space), I do not want that interval the first time the data loads.
+
+Thank you for your help

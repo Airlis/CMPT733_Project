@@ -1,0 +1,11 @@
+Link to div not working properly
+I'm making a site where almost all the different sections are on the home page and i use jQuery scroll to scroll to them when i click the link in the navigation bar
+
+I had to make a different page and i wanted to link those sections to that page too, like when i click about on the other page it takes me to the home page's about div so i used this code for it
+
+<a href="./index.html#about">About.</a>
+It does take me to the about div on the index but that div is on the middle of my screen instead of top
+
+I mean the starting of the div is supposed to be at the top of the screen (just like it is when i navigate to it using a link on the homepage)
+
+Is there any way to fix this?
