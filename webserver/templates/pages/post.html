@@ -1,0 +1,40 @@
+<div class="container">  
+	<br>
+	<h2><strong>Ask a Question</strong></h2>
+
+  <form id="contact" action="" method="post">
+    
+    <h4><strong>Title</strong></h4>
+    <fieldset>
+      <input name="title" placeholder="Your title" value="{{title}}" type="text" tabindex="1" required autofocus>
+    </fieldset>
+
+
+    <h4><strong>Body</strong></h4>
+    <fieldset>
+      <textarea name="body" placeholder="Type your question here...." tabindex="2" required>{{body}}</textarea>
+    </fieldset>
+
+
+    <h4><strong>Tags</strong></h4>
+    <fieldset>
+		<input placeholder="{{results}}" type="text" tabindex="3" >
+    </fieldset>
+
+
+    <fieldset>
+      <button name="action" value="polite" type="submit-left" id="polite-submit" data-submit="...Sending">Check Politness</button>
+      <button name="action" value="tag" type="submit-right" id="tags-submit" data-submit="...Sending">Recommend Tags</button>
+    </fieldset>
+  </form>
+</div>
+<div class="content">
+<tbody>
+   {% for item in json_data %}
+     <tr>
+       <td> {{item}}</td>
+       <td> {{json_data[item]}}</td>
+     </tr>
+   {% endfor %}
+</tbody>
+</div>
