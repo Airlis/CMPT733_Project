@@ -21,8 +21,6 @@ def load_posts(society):
     df = df.withColumnRenamed("_Title","title")
     df = df.withColumnRenamed("_OwnerUserId","userid")
 
-    
-
     df.show()
     table_name = society + '_posts'
     df.write.format("org.apache.spark.sql.cassandra").options(table=table_name, keyspace='stackexchange').save()
