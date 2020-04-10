@@ -1,9 +1,0 @@
-.DS_Store
-__pycache__
-venv
-.log
-*.pyc
-*~
-*.pyo
-*.rdb
-.vscode
