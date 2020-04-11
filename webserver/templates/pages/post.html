@@ -1,9 +1,9 @@
-<div class="container">  
+<div class="container">
 	<br>
 	<h2><strong>Ask a Question</strong></h2>
 
   <form id="contact" action="" method="post">
-    
+
     <h4><strong>Title</strong></h4>
     <fieldset>
       <input name="title" placeholder="Your title" value="{{title}}" type="text" tabindex="1" required autofocus>
@@ -21,20 +21,9 @@
 		<input placeholder="{{results}}" type="text" tabindex="3" >
     </fieldset>
 
-
     <fieldset>
-      <button name="action" value="polite" type="submit-left" id="polite-submit" data-submit="...Sending">Check Politness</button>
-      <button name="action" value="tag" type="submit-right" id="tags-submit" data-submit="...Sending">Recommend Tags</button>
+      <button name="action" value="polite" type="submit-left" id="polite-submit" data-submit="...Sending">Impoliteness Detection</button>
+      <button name="action" value="tag" type="submit-right" id="tags-submit" data-submit="...Sending">Tag Generation</button>
     </fieldset>
   </form>
-</div>
-<div class="content">
-<tbody>
-   {% for item in json_data %}
-     <tr>
-       <td> {{item}}</td>
-       <td> {{json_data[item]}}</td>
-     </tr>
-   {% endfor %}
-</tbody>
 </div>

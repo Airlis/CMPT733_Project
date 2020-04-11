@@ -1,10 +1,13 @@
 from flask import Flask, render_template, url_for, redirect, jsonify, request
 import json
-from config import *
-import torch
-# from bert_pytorch import *
-# from transformers import BertForSequenceClassification
 
+import time
+import config
+from config import app
+import torch
+import functools
+import torch.nn as nn
+from model_helper import BERTBaseUncased
 
 import os, sys
 import tensorflow as tf
@@ -16,109 +19,10 @@ from tensorflow.contrib import learn
 ####################### Import ########################
 
 
-
-
-# function to predict politeness of post title&content
-def sentence_prediction(sentence, model):
-    tokenizer = TOKENIZER
-    max_len = MAX_LEN
-    #review = str(sentence)
-    #print(review)
-    #review = " ".join(review.split())
-    review = [str(sentence)]
-    print(len(review))
-
-
-
-    test_examples = [InputExample(guid=i, text_a=x, labels=[]) for i, x in enumerate(review)]
-    test_features = convert_examples_to_features(test_examples, 256, tokenizer)
-
-
-    ids = torch.tensor([f.input_ids for f in test_features], dtype=torch.long)
-    mask = torch.tensor([f.input_mask for f in test_features], dtype=torch.long)
-    token_type_ids = torch.tensor([f.segment_ids for f in test_features], dtype=torch.long)
-
-    '''
-    print(inputs)
-    inputs = tokenizer.encode(
-        review,
-        None,
-        add_special_tokens=True,
-        max_length=max_len
-    )
-    print(inputs)
-
-    ids = inputs["input_ids"]
-    mask = inputs["attention_mask"]
-    token_type_ids = inputs["token_type_ids"]
-
-    padding_length = max_len - len(ids)
-    ids = ids + ([0] * padding_length)
-    mask = mask + ([0] * padding_length)
-    token_type_ids = token_type_ids + ([0] * padding_length)
-
-    ids = torch.tensor(ids, dtype=torch.long).unsqueeze(0)
-    mask = torch.tensor(mask, dtype=torch.long).unsqueeze(0)
-    token_type_ids = torch.tensor(token_type_ids, dtype=torch.long).unsqueeze(0)
-    '''
-
-    input_ids = ids.to(DEVICE)
-    segment_ids = token_type_ids.to(DEVICE)
-    input_mask = mask.to(DEVICE)
-
-
-    # Compute the logits
-    with torch.no_grad():
-        logits = model(input_ids, segment_ids, input_mask)
-        logits = logits.sigmoid()
-
-    # Save the logits
-
-    all_logits = logits.detach().cpu().numpy()
-
-    print(all_logits)
-    '''
-    outputs = model(ids,token_type_ids,mask)
-    logits = outputs[0]
-    pred = logits.detach().cpu().squeeze().numpy()
-    print('----------------')
-    print(type(logits))
-    print(pred)
-
-    # Compute the logits
-    # with torch.no_grad():
-    #     logits = model(ids, token_type_ids, mask)
-    #     logits = logits.sigmoid()
-    #
-    # # Save the logits
-    # if all_logits is None:
-    #     all_logits = logits.detach().cpu().numpy()
-    # else:
-    #     all_logits = np.concatenate((all_logits, logits.detach().cpu().numpy()), axis=0)
-            # Compute the logits
-
-    with torch.no_grad():
-        logits = model(ids,token_type_ids,mask)
-        logits = logits[0].sigmoid()
-
-    # Save the logits
-    if all_logits is None:
-        all_logits = logits.detach().cpu().numpy()
-    else:
-        all_logits = np.concatenate((all_logits, logits.detach().cpu().numpy()), axis=0)
-    print(all_logits)
-
-    outputs = torch.sigmoid(torch.tensor(pred)).numpy()
-    print(type(outputs))
-    print(outputs)
-    '''
-    return all_logits
-
-
 def generate_tags(dataset, title, body):
     # Data Preparation
     # ==================================================
-    
+
     path = os.path.join('model', dataset)
     text = data_helpers.preprocess(title,body)
     x_text = [data_helpers.clean_str(text)]
@@ -176,6 +80,46 @@ def generate_tags(dataset, title, body):
             tags = [tag_list[i] for i in idx]
     return tags
 
+# function to detect impolite language usage, output: probabilty of impoliteness
+def sentence_prediction(sentence, model):
+    tokenizer = config.TOKENIZER
+    max_len = config.MAX_LEN
+    review = str(sentence)
+    review = " ".join(review.split())
+    print(review)
+    inputs = tokenizer.encode_plus(
+        review,
+        None,
+        add_special_tokens=True,
+        max_length=max_len
+    )
+
+    ids = inputs["input_ids"]
+    mask = inputs["attention_mask"]
+    token_type_ids = inputs["token_type_ids"]
+
+    padding_length = max_len - len(ids)
+    ids = ids + ([0] * padding_length)
+    mask = mask + ([0] * padding_length)
+    token_type_ids = token_type_ids + ([0] * padding_length)
+
+    ids = torch.tensor(ids, dtype=torch.long).unsqueeze(0)
+    mask = torch.tensor(mask, dtype=torch.long).unsqueeze(0)
+    token_type_ids = torch.tensor(token_type_ids, dtype=torch.long).unsqueeze(0)
+
+    ids = ids.to(config.DEVICE, dtype=torch.long)
+    token_type_ids = token_type_ids.to(config.DEVICE, dtype=torch.long)
+    mask = mask.to(config.DEVICE, dtype=torch.long)
+
+    outputs = model(
+        ids=ids,
+        mask=mask,
+        token_type_ids=token_type_ids
+    )
+
+    outputs = torch.sigmoid(outputs).cpu().detach().numpy()
+    return outputs[0][0]
+
 
 def create_new_post(dataset):
     if request.method == 'POST':
@@ -189,16 +133,28 @@ def create_new_post(dataset):
         elif request.form['action'] == 'polite':
             title = request.form['title']
             body = request.form['body']
-            body +=title
-            sentence = body
+            sentence = body+title
 
-            positive_prediction = sentence_prediction(sentence, model=MODEL)[0]
-
-            output = {LABEL_LIST[i]: str(positive_prediction[i]) for i in range(6)}
-            output["polite"] = 1 - sum(positive_prediction)
-
+            start_time = time.time()
+            negative_prediction = sentence_prediction(sentence, model)
+            """
+            if negative_prediction>0.5:
+                res = 'Rude'
+            else:
+                res ='Not Rude'
+            positive_prediction = 1 - negative_prediction
+            response = {}
+            response["response"] = {
+                'positive': str(positive_prediction),
+                'negative': str(negative_prediction),
+                'result': res,
+                'sentence': str(sentence),
+                'time_taken': str(time.time() - start_time)
+            }
+            print(str(time.time() - start_time))
+            """
             return render_template('layout/default.html',
-                                content=render_template('pages/post.html',title=title,body=body, json_data=output) )
+                                content=render_template('pages/result.html',title=title,body=body, prediction=negative_prediction) )
 
     else:
         return render_template('layout/default.html',
@@ -228,40 +184,15 @@ def music():
 def programing():
     return create_new_post("stackoverflow")
 
-# @app.route("/predict", methods=['GET','POST'])
-# def predict():
-#     #sentence = request.args.get("sentence")
-#     if request.method == 'POST':
-#         title = request.form['title']
-#         message = request.form['message']
-#         message +=title
-#         #print(type(message))
-#         sentence = message
-
-#         positive_prediction = sentence_prediction(sentence, model=MODEL)[0]
-
-#         output = {LABEL_LIST[i]: str(positive_prediction[i]) for i in range(6)}
-#         output["polite"] = 1 - sum(positive_prediction)
-
-#         return render_template('layout/default.html',
-#                                 content=render_template('pages/result.html', json_data=output) )
-
-
 
 if __name__ == '__main__':
 
-    # model_state_dict = torch.load(BERT_MODEL, map_location='cpu')
-    #MODEL = BertForSequenceClassification.from_pretrained(BERT_CONFIG,state_dict = model_state_dict, num_labels=6)
-
-    # MODEL = BertForMultiLabelSequenceClassification.from_pretrained(BERT_PATH,
-                                                                             # num_labels=6,
-                                                                             # state_dict=model_state_dict)
-
-    # MODEL.to(DEVICE)
-    # MODEL.eval()
-
-    ####################################################
-
+    # load nlp Bert model with model2.bin weights
+    model = BERTBaseUncased()
+    model = nn.DataParallel(model)
+    model.load_state_dict(torch.load(config.MODEL_PATH, map_location=torch.device('cpu')))
+    model.to(config.DEVICE)
+    model.eval()
 
     # add para debug=True here to enable refresh update
     app.run(debug=True)
