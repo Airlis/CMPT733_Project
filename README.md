@@ -24,7 +24,11 @@ This project has four major components:
 
 ### Politness analysis Model
 
-#### Training
+#### Preprocessing
+
+#### Training: download bert-base-uncased.zip from XXX, unzip it and put it into impoliteness detection -> model
+
+#### Make Prediction
 
 ### Web Demo
 
