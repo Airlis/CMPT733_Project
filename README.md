@@ -26,8 +26,6 @@ This project has four major components:
 
 #### Preprocessing
 
-#### Training: download bert-base-uncased.zip from XXX, unzip it and put it into impoliteness detection -> model
-
 #### Make Prediction
 
 ### Web Demo
@@ -50,3 +48,4 @@ python app.py
 Open browser and go to ```http://localhost:5000/```
 
 
+#### Training: make a copy of bert-base-uncased folder in webserver/model/language, and put it into impoliteness detection -> model folder
