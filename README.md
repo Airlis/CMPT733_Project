@@ -17,7 +17,7 @@ This project has four major components:
 
 ### Tag Prediction Model
 
-To reproduce the training result, download Stack Exchange data dump, run ```parse_xml``` to preprocess the dataset, then run training script ```train.py```
+To reproduce the training result, download Stack Exchange data dump, run ```parse_xml.py``` to preprocess the dataset, then run training script ```train.py```
 
 ### Offensive Language Detection Model
 
