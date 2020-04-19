@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<style type="text/css">
+  div#content {
+    display: none;
+    }
+
+  div#loading {
+      top: 50%;
+      left: 50%;
+      margin: auto;
+      position: absolute;
+      z-index: 1000;
+      width: 160px;
+      height: 24px;
+      background: url(/static/img/loading.gif) no-repeat;
+      cursor: wait;
+      }
+</style>
+
+
+<head>
+  <title>CMPT 733</title>
+
+  {% include 'includes/header.html' %}
+
+  <script type="text/javascript">// <![CDATA[
+        function preloader(){
+            document.getElementById("loading").style.display = "none";
+            document.getElementById("content").style.display = "block";
+        }//preloader
+        window.onload = preloader;
+// ]]></script>
+
+</head>
+
+<body>
+  <div id="loading"></div>
+  <div id="content">
+
+    {% include 'includes/scripts.html' %}
+    <div class="wrapper ">
+
+      {% include 'includes/sidebar.html' %}
+
+
+      <div class="main-panel">
+
+
+        {{ content | safe }}
+
+      </div>
+    </div>
+
+  </div>
+</body>
+
+</html>
