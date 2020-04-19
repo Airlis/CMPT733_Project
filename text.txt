@@ -1,8 +1,0 @@
-export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_231.jdk/Contents/Home
-export SPARK_HOME=/Users/airlis/Documents/spark-2.4.4-bin-hadoop2.7/
-export PYSPARK_PYTHON=python
-
-
-${SPARK_HOME}/bin/spark-submit 
-
-
