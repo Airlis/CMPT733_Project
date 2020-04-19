@@ -1,4 +1,5 @@
-# CMPT733_Project
+# CMPT733 Project 
+# Stack Exchange: Can we make it better?
 
 This project has four major components:
 
@@ -15,17 +16,17 @@ This project has four major components:
 * pytorch
 * pyspark 2.4
 
-### Tag Prediction Model
+### 1. Tag Prediction Model
 
 To reproduce the training result, download Stack Exchange data dump, run ```parse_xml.py``` to preprocess the dataset, then run training script ```train.py```
 
-### Offensive Language Detection Model
+### 2. Offensive Language Detection Model
 
 To reproduce the training result, make a copy of bert-base-uncased folder in webserver/model/language, and put it into ```impoliteness detection/model```  folder, and run ```train.py```.
 
-### Cross-Platforms Analysis
+### 3. Cross-Platforms Analysis
 
-#### Preprocessing
+#### 3.1 Preprocessing
 
 The dataset is downloaded from https://archive.org/details/stackexchange
 
@@ -34,7 +35,7 @@ Please download the files related to StackOverflow, Bicycle, Games, Movie and Mu
 
 The files foe EDA are ``posthistory_tag_only.py``, ``posts_time.py``, ``tag_history_analysis.py``. Please run with python command to view the results.
 
-#### Tag Synonyms
+#### 3.2 Tag Synonyms
 
 Please download BeautifulSoup before running the code.
 
@@ -44,7 +45,7 @@ Please edit the file to have the right web page and page number (for the for loo
 
 ``tag_synonym_evaluation.py`` checks the results.
 
-#### Find relations
+#### 3.3 Find relations
 
 First run ``spark-submit --packages com.databricks:spark-xml_2.11:0.7.0 user_matching.py so bicycle games movie music`` to get all the cross-platform users.
 
@@ -54,7 +55,7 @@ Run ``spark-submit post_relation.py so bicycle games movie music [tag]`` to get 
 
 Finally run ``spark-submit [tag]`` to see the statistcal results of the provided tags with the five given societies.
 
-### Web Demo
+### 4. Web Demo
 
 Download model checkpoints from 
 
